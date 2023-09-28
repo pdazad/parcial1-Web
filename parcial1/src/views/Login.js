@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-
-// Importa el archivo JSON local
 import loginData from "./login.json";
 
 function Login() {
@@ -11,6 +9,7 @@ function Login() {
   const [emailValid, setEmailValid] = useState(true);
   const [passwordValid, setPasswordValid] = useState(true);
   const [error, setError] = useState("");
+  const [step, setStep] = useState(1); // Estado para controlar el paso actual
 
   const handleEmailChange = (e) => {
     setFormData({ ...formData, email: e.target.value });
@@ -34,67 +33,89 @@ function Login() {
     setPasswordValid(isPasswordValid);
   };
 
+  const changeStep = () => {
+    if (step === 1) {
+      // Si estamos en el paso 1 y el correo es válido, avanza al paso 2
+      if (emailValid) {
+        setError("");
+        setStep(2);
+      } else {
+        setError("El correo electrónico es inválido");
+      }
+    } else if (step === 2) {
+      // Si estamos en el paso 2 y la contraseña es válida, inicia sesión
+      if (passwordValid) {
+        addUserToJSON();
+      } else {
+        setError("La contraseña no es válida");
+      }
+    }
+  };
+
   const addUserToJSON = () => {
     if (!emailValid || !passwordValid) {
       setError("El correo electrónico o la contraseña son inválidos");
       return;
     }
 
+    console.log("Agregando usuario al JSON", formData);
     // Crear un nuevo objeto de usuario
     const newUser = {
-      id: loginData.length + 1, // Asigna un nuevo ID
+      id: loginData.length + 1, 
       email: formData.email,
       password: formData.password,
-      role: true, // Aquí puedes establecer el valor de rol que necesites
+      role: true, //Modificamos acá para cambair rol
     };
 
-    // Agregar el nuevo usuario al arreglo de datos
     loginData.push(newUser);
 
-    // Redirigir al usuario a la página de Home
     navigate("/Home", { state: { userRole: newUser.role } });
   };
 
   return (
     <div className="container mt-5">
       <div className="row">
-        <div className="col-md-6">
-          <img
-            src="ruta_de_la_imagen.png"
-            alt="Imagen de inicio de sesión"
-            className="img-fluid"
-          />
-        </div>
-        <div className="col-md-6">
-          <h2>Iniciar Sesión</h2>
+        <div className="col-md-12">
           {error && <div className="alert alert-danger">{error}</div>}
-          <form>
-            <div className="form-group">
-              <label>Correo Electrónico</label>
-              <input
-                type="email"
-                className={`form-control ${emailValid ? "" : "is-invalid"}`}
-                value={formData.email}
-                onChange={handleEmailChange}
-              />
-              {!emailValid && <div className="invalid-feedback">Correo electrónico no válido</div>}
-            </div>
-            <div className="form-group">
-              <label>Contraseña</label>
-              <input
-                type="password"
-                className={`form-control ${passwordValid ? "" : "is-invalid"}`}
-                value={formData.password}
-                onChange={handlePasswordChange}
-              />
-              {!passwordValid && (
-                <div className="invalid-feedback">La contraseña debe tener al menos 6 caracteres</div>
-              )}
-            </div>
-            <button type="button" className="btn btn-primary" onClick={addUserToJSON}>
-              Iniciar Sesión
-            </button>
-          </form>
+          {step === 1 && (
+            <form>
+              <div className="form-group">
+                <h2>Acceder</h2>
+                <h4>Usa tu cuenta UniAlpes</h4>
+                <label>Correo Electrónico</label>
+                <input
+                  type="email"
+                  className={`form-control ${emailValid ? "" : "is-invalid"}`}
+                  value={formData.email}
+                  onChange={handleEmailChange}
+                />
+                {!emailValid && <div className="invalid-feedback">Correo electrónico no válido</div>}
+              </div>
+              <button type="button" className="btn btn-primary" onClick={changeStep}>
+                Siguiente
+              </button>
+            </form>
+          )}
+          {step === 2 && (
+            <form>
+              <div className="form-group">
+                <h4>{formData.email}</h4>
+                <label>Contraseña</label>
+                <input
+                  type="password"
+                  className={`form-control ${passwordValid ? "" : "is-invalid"}`}
+                  value={formData.password}
+                  onChange={handlePasswordChange}
+                />
+                {!passwordValid && (
+                  <div className="invalid-feedback">La contraseña debe tener al menos 6 caracteres, al menos un caracter especial y un número, mayúsculas y minusculas.</div>
+                )}
+              </div>
+              <button type="button" className="btn btn-primary" onClick={changeStep}>
+                Iniciar Sesión
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </div>
