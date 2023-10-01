@@ -58,7 +58,7 @@ El componente Login se creó para gestionar la autenticación de los usuarios. A
 
 ### Componente Home
 
-El componente Home muestra una lista de elementos (en este caso, detalles de automóviles) y permite al usuario seleccionar un elemento para ver más detalles. Aquí tienes algunos detalles clave:
+El componente Home muestra una lista de elementos (en este caso, detalles de automóviles) y permite al usuario seleccionar un elemento para ver más detalles. Algunos detalles clave:
 
 - **Carga de Datos:** Los detalles de los automóviles se cargan desde un archivo JSON externo y se almacenan en el estado local utilizando `useState` de React.
 
@@ -68,7 +68,7 @@ El componente Home muestra una lista de elementos (en este caso, detalles de aut
 
 ### Componente CarDetail
 
-El componente CarDetail muestra información detallada sobre un automóvil seleccionado. Aquí tienes algunos detalles clave:
+El componente CarDetail muestra información detallada sobre un automóvil seleccionado. Algunos detalles clave:
 
 - **Obtención de Datos:** Utiliza `useLocation` para obtener los datos del automóvil seleccionado de la ubicación de la ruta.
 
