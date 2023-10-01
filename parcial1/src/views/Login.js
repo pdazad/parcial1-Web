@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import loginData from "./login.json";
+import { FormattedMessage, useIntl } from "react-intl";
 
 function Login() {
   const navigate = useNavigate();
@@ -10,6 +11,8 @@ function Login() {
   const [passwordValid, setPasswordValid] = useState(true);
   const [error, setError] = useState("");
   const [step, setStep] = useState(1); // Estado para controlar el paso actual
+
+  const intl = useIntl(); // Obtiene el objeto intl para traducción
 
   const handleEmailChange = (e) => {
     setFormData({ ...formData, email: e.target.value });
@@ -35,26 +38,28 @@ function Login() {
 
   const changeStep = () => {
     if (step === 1) {
-      // Si estamos en el paso 1 y el correo es válido, avanza al paso 2
       if (emailValid) {
         setError("");
         setStep(2);
       } else {
-        setError("El correo electrónico es inválido");
+        setError(intl.formatMessage({ id: "login.emailInvalid" })); // Usa intl para obtener el mensaje
       }
     } else if (step === 2) {
-      // Si estamos en el paso 2 y la contraseña es válida, inicia sesión
       if (passwordValid) {
         addUserToJSON();
       } else {
-        setError("La contraseña no es válida");
+        setError(intl.formatMessage({ id: "login.passwordInvalid" })); // Usa intl para obtener el mensaje
       }
     }
   };
 
+  const generateRandomRole = () => {
+    return Math.random() < 0.5; // Esto asignará true en un 50% de las veces y false en un 50% de las veces
+  };
+
   const addUserToJSON = () => {
     if (!emailValid || !passwordValid) {
-      setError("El correo electrónico o la contraseña son inválidos");
+      setError(intl.formatMessage({ id: "login.invalidCredentials" })); // Usa intl para obtener el mensaje
       return;
     }
 
@@ -64,7 +69,7 @@ function Login() {
       id: loginData.length + 1, 
       email: formData.email,
       password: formData.password,
-      role: true, //Modificamos acá para cambair rol
+      role: generateRandomRole(), // Modificamos acá para cambiar el rol
     };
 
     loginData.push(newUser);
@@ -80,19 +85,29 @@ function Login() {
           {step === 1 && (
             <form>
               <div className="form-group">
-                <h2>Acceder</h2>
-                <h4>Usa tu cuenta UniAlpes</h4>
-                <label>Correo Electrónico</label>
+                <h2>
+                  <FormattedMessage id="login.loginHeader" />
+                </h2>
+                <h4>
+                  <FormattedMessage id="login.useUniAlpesAccount" />
+                </h4>
+                <label>
+                  <FormattedMessage id="login.emailLabel" />
+                </label>
                 <input
                   type="email"
                   className={`form-control ${emailValid ? "" : "is-invalid"}`}
                   value={formData.email}
                   onChange={handleEmailChange}
                 />
-                {!emailValid && <div className="invalid-feedback">Correo electrónico no válido</div>}
+                {!emailValid && (
+                  <div className="invalid-feedback">
+                    <FormattedMessage id="login.emailInvalidMessage" />
+                  </div>
+                )}
               </div>
               <button type="button" className="btn btn-primary" onClick={changeStep}>
-                Siguiente
+                <FormattedMessage id="login.nextButton" />
               </button>
             </form>
           )}
@@ -100,7 +115,9 @@ function Login() {
             <form>
               <div className="form-group">
                 <h4>{formData.email}</h4>
-                <label>Contraseña</label>
+                <label>
+                  <FormattedMessage id="login.passwordLabel" />
+                </label>
                 <input
                   type="password"
                   className={`form-control ${passwordValid ? "" : "is-invalid"}`}
@@ -108,11 +125,13 @@ function Login() {
                   onChange={handlePasswordChange}
                 />
                 {!passwordValid && (
-                  <div className="invalid-feedback">La contraseña debe tener al menos 6 caracteres, al menos un caracter especial y un número, mayúsculas y minusculas.</div>
+                  <div className="invalid-feedback">
+                    <FormattedMessage id="login.passwordInvalidMessage" />
+                  </div>
                 )}
               </div>
               <button type="button" className="btn btn-primary" onClick={changeStep}>
-                Iniciar Sesión
+                <FormattedMessage id="login.loginButton" />
               </button>
             </form>
           )}

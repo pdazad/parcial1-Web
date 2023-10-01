@@ -1,82 +1,125 @@
+import { useLocation } from "react-router-dom";
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
-import { Card } from "react-bootstrap";
+import { Card, Button, Container, Row, Col } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { FormattedMessage, useIntl } from "react-intl"; 
+import "./CarDetail.css";
 
-function CarDetail({ cars, userRole }) {
-  const { carModel } = useParams();
-  const selectedCar = cars.find((car) => car.carModel === carModel);
+function CarDetail() {
+  const location = useLocation();
+  const { state: { car, userRole } } = location;
+  const [editable, setEditable] = useState(userRole);
+  const intl = useIntl();
 
-  const [carDetails, setCarDetails] = useState(selectedCar);
+  const handleEditToggle = () => {
+    setEditable(!editable);
+  };
 
   return (
     <div className="car-details">
-      <h2>Detalles del Carro</h2>
-      <Card>
-        <Card.Img variant="top" src={carDetails.image} alt={carDetails.partName} />
-        {userRole ? (
-          <Card.Body>
-            <Card.Title>{carDetails.partName}</Card.Title>
-            <Card.Text>
-              Hecho por:
-              <input
-                type="text"
-                value={carDetails.carMaker}
-                onChange={(e) => setCarDetails({ ...carDetails, carMaker: e.target.value })}
-              />
-            </Card.Text>
-            <Card.Text>
-              Modelo:
-              <input
-                type="text"
-                value={carDetails.carModel}
-                onChange={(e) => setCarDetails({ ...carDetails, carModel: e.target.value })}
-              />
-            </Card.Text>
-            <Card.Text>
-              Año:
-              <input
-                type="text"
-                value={carDetails.carYear}
-                onChange={(e) => setCarDetails({ ...carDetails, carYear: e.target.value })}
-              />
-            </Card.Text>
-            <Card.Text>
-              Disponible:
-              <input
-                type="text"
-                value={carDetails.avalaible}
-                onChange={(e) => setCarDetails({ ...carDetails, avalaible: e.target.value })}
-              />
-            </Card.Text>
-            <Card.Text>
-              Descripción:
-              <input
-                type="text"
-                value={carDetails.description}
-                onChange={(e) => setCarDetails({ ...carDetails, description: e.target.value })}
-              />
-            </Card.Text>
-            <Card.Text>
-              Precio:
-              <input
-                type="text"
-                value={carDetails.price}
-                onChange={(e) => setCarDetails({ ...carDetails, price: e.target.value })}
-              />
-            </Card.Text>
-          </Card.Body>
-        ) : (
-          <Card.Body>
-            <Card.Title>{carDetails.partName}</Card.Title>
-            <Card.Text>Hecho por: {carDetails.carMaker}</Card.Text>
-            <Card.Text>Modelo: {carDetails.carModel}</Card.Text>
-            <Card.Text>Año: {carDetails.carYear}</Card.Text>
-            <Card.Text>Disponible: {carDetails.avalaible ? "Sí" : "No"}</Card.Text>
-            <Card.Text>Descripción: {carDetails.description}</Card.Text>
-            <Card.Text>Precio: {carDetails.price}</Card.Text>
-          </Card.Body>
-        )}
-      </Card>
+      <Container>
+        <h2>
+          <FormattedMessage id="carDetail.detailHeader" />
+        </h2>
+        <Row>
+          <Col md={7}>
+            <Card.Img variant="top" src={car.image} alt={car.carModel} />
+          </Col>
+          <Col md={5}>
+            <Card className="text-Detail">
+              <Card.Body>
+                <Card.Title>{car.partName}</Card.Title>
+                {editable ? (
+                  <div>
+                    {/* Campos de entrada editable */}
+                    <Card.Text>
+                      <FormattedMessage id="carDetail.madeBy" />
+                      <input
+                        type="text"
+                        value={car.carMaker}
+                        onChange={(e) => car.carMaker = e.target.value}
+                      />
+                    </Card.Text>
+                    <Card.Text>
+                      <FormattedMessage id="carDetail.model" />
+                      <input
+                        type="text"
+                        value={car.carModel}
+                        onChange={(e) => car.carModel = e.target.value}
+                      />
+                    </Card.Text>
+                    <Card.Text>
+                      <FormattedMessage id="carDetail.year" />
+                      <input
+                        type="text"
+                        value={car.carYear}
+                        onChange={(e) => car.carYear = e.target.value}
+                      />
+                    </Card.Text>
+                    <Card.Text>
+                      <FormattedMessage id="carDetail.available" />
+                      <input
+                        type="checkbox"
+                        checked={car.avalaible}
+                        onChange={(e) => car.avalaible = e.target.checked}
+                      />
+                    </Card.Text>
+                    <Card.Text>
+                      <FormattedMessage id="carDetail.description" />
+                      <input
+                        type="text"
+                        value={car.description}
+                        onChange={(e) => car.description = e.target.value}
+                      />
+                    </Card.Text>
+                    <Card.Text>
+                      <FormattedMessage id="carDetail.price" />
+                      <input
+                        type="text"
+                        value={car.price}
+                        onChange={(e) => car.price = e.target.value}
+                      />
+                    </Card.Text>
+                    <Button onClick={handleEditToggle}>
+                      <FormattedMessage id="carDetail.saveChanges" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div>
+                    {/* Detalles como texto puro */}
+                    <Card.Text>
+                      <FormattedMessage id="carDetail.madeBy" />: <p>{car.carMaker}</p>
+                    </Card.Text>
+                    <Card.Text>
+                      <FormattedMessage id="carDetail.model" />: <p>{car.carModel}</p>
+                    </Card.Text>
+                    <Card.Text>
+                      <FormattedMessage id="carDetail.year" />: <p>{car.carYear}</p>
+                    </Card.Text>
+                    <Card.Text>
+                      <FormattedMessage id="carDetail.description" />: <p>{car.description}</p>
+                    </Card.Text>
+                    <Card.Text>
+                    <FormattedMessage id="carDetail.price" />:{" "}
+                    {intl.formatNumber(
+                      parseFloat(car.price.replace("$", "")) *
+                        (intl.locale === "es-ES" || intl.locale === "es" ? 3800 : 1), // 3800 es el factor de conversión
+                      {
+                        style: "currency",
+                        currency: intl.locale === "es" ? "COP" : "USD",
+                      }
+                    )}
+                  </Card.Text>
+                  </div>
+                )}
+                <Link to="/Home" state={{ userRole: userRole }}>
+                  <FormattedMessage id="carDetail.backToList" />
+                </Link>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
     </div>
   );
 }
